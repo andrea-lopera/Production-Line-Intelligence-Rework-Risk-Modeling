@@ -1,26 +1,48 @@
-# Production Line Intelligence Dashboard
+# Production Line Intelligence & Rework Risk Modeling
 
-A simulated manufacturing analytics project for tracking KPIs, downtime, and rework using **Python**, **SQL**, and **Tableau**.
+A simulated multi-stage production line analytics project for tracking throughput, cycle time, rework, and downtime using **Python**, **PostgreSQL**, **Tableau**, and **Machine Learning**.
 
 ---
 
 ## Project Purpose
 
-This project simulates a production environment to showcase operational analytics skills — from data generation to interactive reporting.
+This project simulates a **multi-step manufacturing process** (cutting → tempering → framing/assembly) and builds an end-to-end analytics stack around it:
+- **Python** to generate realistic production and quality data (JSON + CSV)
+- **PostgreSQL** to model the process with relational tables, joins, and window functions
+- **Tableau** to create operations dashboards
+- **Scikit-learn** to predict which units will need rework and why
 
-**Tools:** `Python` · `pandas` · `matplotlib/seaborn` · `SQL` · `Tableau`  
-**Skills:** KPI monitoring · Root cause analysis · Dashboarding · Data simulation · Operational analytics
+**Tools:** `Python` · `pandas` · `NumPy` · `scikit-learn` · `PostgreSQL` · `Tableau`  
+**Skills:** Data simulation · SQL modeling · Feature engineering · Dashboarding · Classification (LogReg, Random Forest)
 
 ---
 
 ## Phase 1: Define the Process + Simulate Data
 
-We defined a 3-shift glass production process and simulated operational data using Python.
+We defined a 3-shift, multi-machine production process and simulated operational data over a full quarter. The flow mirrors a typical discrete manufacturing line (for example, architectural glass panels or other custom fabricated components).
 
-### Key Details:
-- **Units produced**: 300  
-- **Shifts**: 3 per day  
-- **Product categories**: Doors, Walls, Flooring, Stairs, Partitions  
+### Process Setup:
+- **Time horizon**: Jan 1 - Jun 1, 2025 (about 5 months of production)  
+- **Shifts:** 3 per day (Shift 1, Shift 2, Shift 3)
+- **Machines:** 20 machines (M01–M20)
+- **Total Units:** 54,720
+- **Product types:** Standard, Custom  
+- **Product categories**: Doors, Walls, Flooring, Stairs, Partitions (representing different product families / SKUs)
+
+**Production_Logs (JSON, row-oriented)**  
+Row-oriented JSON, one record per unit produced:
+
+- `timestamp`
+- `unit_id`
+- `shift`
+- `machine_id`
+- `product_type`
+- `product_category`
+- `cutting_time`
+- `tempering_time`
+- `framing_time`
+
+  
 - **Metrics**:
   - Processing times (cutting, tempering, framing)
   - Downtime minutes

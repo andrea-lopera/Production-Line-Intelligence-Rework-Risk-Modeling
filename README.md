@@ -1,70 +1,29 @@
 # Production Line Intelligence & Rework Risk Modeling
 
-<<<<<<< HEAD
 A simulated **multi-stage production line** analytics project for tracking throughput, cycle time, rework, and downtime using **Python**, **PostgreSQL**, **Tableau**, and **machine learning**.  
-=======
-A simulated multi-stage production line analytics project for tracking throughput, cycle time, rework, and downtime using **Python**, **PostgreSQL**, **Tableau**, and **Machine Learning**.
->>>>>>> d93b2db75807e1379577a1f432b8cf734ade8a0b
+(Modeled after an architectural glass line, but designed to be transferable to other discrete manufacturing environments.)
 
 ---
 
 ## Project Purpose
 
 This project simulates a **multi-step manufacturing process** (cutting → tempering → framing/assembly) and builds an end-to-end analytics stack around it:
-<<<<<<< HEAD
 
 - **Python** to generate realistic production and quality data (JSON + CSV)
 - **PostgreSQL** to model the process with relational tables, joins, and window functions
 - **Tableau** to create operations dashboards
 - **Scikit-learn** to predict **which units will need rework** and **why**
 
-=======
-- **Python** to generate realistic production and quality data (JSON + CSV)
-- **PostgreSQL** to model the process with relational tables, joins, and window functions
-- **Tableau** to create operations dashboards
-- **Scikit-learn** to predict which units will need rework and why
-
->>>>>>> d93b2db75807e1379577a1f432b8cf734ade8a0b
 **Tools:** `Python` · `pandas` · `NumPy` · `scikit-learn` · `PostgreSQL` · `Tableau`  
 **Skills:** Data simulation · SQL modeling · Feature engineering · Dashboarding · Classification (LogReg, Random Forest)
 
 ---
 
-## Phase 1: Define the Process + Simulate Data
+## Phase 1: Define the Process & Simulate Data (Python)
 
 We defined a 3-shift, multi-machine production process and simulated operational data over a full quarter. The flow mirrors a typical discrete manufacturing line (for example, architectural glass panels or other custom fabricated components).
 
-<<<<<<< HEAD
 ### Process Setup
-=======
-### Process Setup:
-- **Time horizon**: Jan 1 - Jun 1, 2025 (about 5 months of production)  
-- **Shifts:** 3 per day (Shift 1, Shift 2, Shift 3)
-- **Machines:** 20 machines (M01–M20)
-- **Total Units:** 54,720
-- **Product types:** Standard, Custom  
-- **Product categories**: Doors, Walls, Flooring, Stairs, Partitions (representing different product families / SKUs)
-
-**Production_Logs (JSON, row-oriented)**  
-Row-oriented JSON, one record per unit produced:
-
-- `timestamp`
-- `unit_id`
-- `shift`
-- `machine_id`
-- `product_type`
-- `product_category`
-- `cutting_time`
-- `tempering_time`
-- `framing_time`
-
-  
-- **Metrics**:
-  - Processing times (cutting, tempering, framing)
-  - Downtime minutes
-  - Quality check result + rework flag
-  - Rework reason (for failures only)
->>>>>>> d93b2db75807e1379577a1f432b8cf734ade8a0b
 
 - **Units produced**: 54,720
 - **Time horizon:** Jan 1 – Jun 1, 2025 (about 5 months of production)  

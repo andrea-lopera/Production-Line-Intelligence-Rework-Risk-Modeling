@@ -277,12 +277,12 @@ Categorical variables were one-hot encoded.
 
 #### Model Comparison
 
-```text
+
 | Model                                | Accuracy | Precision | Recall |   F1   |
 |--------------------------------------|---------:|----------:|-------:|-------:|
 | Logistic Regression (class_weighted) |   0.567  |    0.381  | 0.828  | 0.522  |
 | Random Forest (tuned)                |   0.539  |    0.374  | 0.914  | 0.531  |
-```
+
 
 **Why Random Forest for Rework Risk?**
 
@@ -305,14 +305,13 @@ For units that failed QC (`rework_flag = 1`), we predict a **high-level rework b
 
 **Metrics (test set)**
 
-```text
 | Bucket                         | Precision | Recall |  F1  | Support |
 |--------------------------------|----------:|-------:|-----:|--------:|
 | Dimensional / Assembly Issues  |     0.95  |  0.93  | 0.94 |   2377  |
 | Equipment / Human Factors      |     0.89  |  0.98  | 0.93 |    541  |
 | Surface / Material Defects     |     0.33  |  0.30  | 0.32 |    204  |
-| **Overall Accuracy**           |           |        |**0.90**|  3122  |
-```
+| **Overall Accuracy**           |           |        | **0.90** |  3122   |
+
 
 **Observations**
 

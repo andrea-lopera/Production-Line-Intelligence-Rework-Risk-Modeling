@@ -1,37 +1,132 @@
-# Production Line Intelligence Dashboard
+# Production Line Intelligence & Rework Risk Modeling
 
-A simulated manufacturing analytics project for tracking KPIs, downtime, and rework using **Python**, **SQL**, and **Tableau**.
+A simulated **multi-stage production line** analytics project for tracking throughput, cycle time, rework, and downtime using **Python**, **PostgreSQL**, **Tableau**, and **machine learning**.  
 
 ---
 
 ## Project Purpose
 
-This project simulates a production environment to showcase operational analytics skills — from data generation to interactive reporting.
+This project simulates a **multi-step manufacturing process** (cutting → tempering → framing/assembly) and builds an end-to-end analytics stack around it:
 
-**Tools:** `Python` · `pandas` · `matplotlib/seaborn` · `SQL` · `Tableau`  
-**Skills:** KPI monitoring · Root cause analysis · Dashboarding · Data simulation · Operational analytics
+- **Python** to generate realistic production and quality data (JSON + CSV)
+- **PostgreSQL** to model the process with relational tables, joins, and window functions
+- **Tableau** to create operations dashboards
+- **Scikit-learn** to predict **which units will need rework** and **why**
+
+**Tools:** `Python` · `pandas` · `NumPy` · `scikit-learn` · `PostgreSQL` · `Tableau`  
+**Skills:** Data simulation · SQL modeling · Feature engineering · Dashboarding · Classification (LogReg, Random Forest)
 
 ---
 
 ## Phase 1: Define the Process + Simulate Data
 
-We defined a 3-shift glass production process and simulated operational data using Python.
+We defined a 3-shift, multi-machine production process and simulated operational data over a full quarter. The flow mirrors a typical discrete manufacturing line (for example, architectural glass panels or other custom fabricated components).
 
-### Key Details:
-- **Units produced**: 300  
-- **Shifts**: 3 per day  
-- **Product categories**: Doors, Walls, Flooring, Stairs, Partitions  
-- **Metrics**:
-  - Processing times (cutting, tempering, framing)
-  - Downtime minutes
-  - Quality check result + rework flag
-  - Rework reason (for failures only)
+### Process Setup
 
-### Files:
-- `notebooks/01_data_simulation.ipynb` – Python code to simulate production data  
-- `data/production_data.csv` – Final output (ready for analysis)
+- **Units produced**: 54,720
+- **Time horizon:** Jan 1 – Jun 1, 2025 (about 5 months of production)  
+- **Shifts:** 3 per day (Shift 1, Shift 2, Shift 3)  
+- **Machines:** 20 machines (M01–M20)  
+- **Units per machine per shift:** 6  
+- **Product types:** Standard, Custom  
+- **Product categories:** Doors, Walls, Flooring, Stairs, Partitions (representing different product families / SKUs)
+
+### Generated Datasets
+
+**Production_Logs (JSON, row-oriented)**  
+Row-oriented JSON, one record per unit produced:
+
+- `timestamp`
+- `unit_id`
+- `shift`
+- `machine_id`
+- `product_type`
+- `product_category`
+- `cutting_time`
+- `tempering_time`
+- `framing_time`
+
+**Quality_Audit (CSV)**  
+One record per unit, focusing on QC:
+
+- `unit_id`
+- `qc_result` (Pass / Fail)
+- `rework_flag` (0/1)
+- `downtime_minutes`
+- `rework_reason` (detailed defect / cause)
+
+### Files
+
+- `notebooks/01_data_production.ipynb` – Python code to generate `Production_Logs.json` + `Quality_Audit.csv`  
+- `data/Production_Logs_Single.json` – Row-oriented NDJSON (one record per line) 
+- `data/Production_Logs.json` – JSON (An array of objects [])  
+- `data/Quality_Audit.csv` – QC outcomes and rework info  
 
 ---
+
+## Phase 2: SQL Data Modeling & Feature Engineering (PostgreSQL)
+
+We loaded the simulated data into PostgreSQL to emulate a basic **operations data mart** and do feature engineering in SQL.
+
+### Steps
+
+- Created a **staging table** for raw JSON and used `\copy` to load `Production_Logs.json` as text.
+- Parsed the JSON into a clean **`production_logs`** table with columns:
+
+  - `prod_timestamp`
+  - `unit_id`
+  - `shift`
+  - `machine_id`
+  - `product_type`
+  - `product_category`
+  - `cutting_time`
+  - `tempering_time`
+  - `framing_time`
+
+- Loaded **`Quality_Audit.csv`** into a **`quality_audit`** table:
+
+  - `unit_id`
+  - `qc_result`
+  - `rework_flag`
+  - `downtime_minutes`
+  - `rework_reason`
+
+- Defined a **foreign key** relationship on `unit_id`.
+- Built a **view** joining production and quality:
+
+```sql
+CREATE VIEW production_with_qc AS
+SELECT 
+    p.prod_timestamp,
+    p.unit_id,
+    p.shift,
+    p.machine_id,
+    p.product_type,
+    p.product_category,
+    p.cutting_time,
+    p.tempering_time,
+    p.framing_time,
+    q.qc_result,
+    q.rework_flag,
+    q.downtime_minutes,
+    q.rework_reason
+FROM production_logs AS p
+JOIN quality_audit AS q
+  ON q.unit_id = p.unit_id;
+```
+
+- Used SQL window functions to engineer features such as:
+  - **Cumulative downtime per machine over time**
+  - **Cycle time** (sum of cutting + tempering + framing)
+
+The resulting view is exported as a clean table for Tableau and modeling.
+
+### Files
+
+- `ETL/production_data.sql` – Table creation, JSON staging, CSV load, view definition  
+- `data/production_with_qc.csv` – Exported dataset used for Tableau and ML  
+
 
 ## Phase 2: Exploratory Data Analysis
 
@@ -57,46 +152,181 @@ We explored the simulated production dataset to uncover trends in processing tim
 
 ---
 
-## Phase 3: Dashboard with Tableau
+## Phase 3: Exploratory Data Analysis (Python)
 
-In this phase, we transformed the CSV data into an interactive Tableau dashboard to simulate real-time monitoring for manufacturing operations.
+Using the joined dataset, we explored relationships between process times, rework, and downtime.
 
-### Visuals:
-- Bar Chart: Units produced per shift  
-- Pie Chart: Rework reason distribution  
-- KPI Cards: Total Units, Rework Rate, Avg Cycle Time  
-- Line Chart: Units over time  
-- Filters: Product category, Shift, Rework flag  
+### Key Analyses
 
-### Dashboard with Tableau:
-Here's a preview of the final interactive dashboard built in Tableau Public:
+- Production volume by **shift**, **machine**, and **product category**
+- Distribution of **cycle time** and process times (cutting, tempering, framing)
+- **Rework rate** by product category, shift, and machine
+- Pareto-style distribution of **rework reasons**
+- Correlation matrix between:
+  - process times  
+  - `rework_flag`  
+  - `downtime_minutes`  
+  - `cycle_time`
 
-[![Production Insights Preview](dashboards/screenshots/production_thumbnail.png)]
-[![Quality Insights Preview](dashboards/screenshots/quality_thumbnail.png)]
+### Highlights
 
-> [🔗 View Tableau Dashboard ([click here](https://public.tableau.com/app/profile/andrea.lopera/viz/ProductionKPIsDowntimeTrends/ProductionOverview))]
+- **Custom & complex product families** (like Flooring and Stairs) have longer cycle times and higher rework rates.  
+- **Tempering time** behaves like a stable core process: mostly uncorrelated with rework, as long as it stays within spec.  
+- **Cycle time** and **rework_flag** are positively correlated: longer jobs are more likely to require rework.  
+- **Downtime_minutes** is strongly tied to rework, as expected.
 
-### Files:
-- Tableau Workbook: `dashboards/Production Overview.twbx`  
-- Preview: `dashboards/screenshots/`
+### Files
 
----
-
-## Project Goal
-
-By the end, this dashboard will help:
-- Monitor process efficiency and product quality  
-- Identify shifts or product types with high rework or downtime  
-- Demonstrate analytics and reporting skills using realistic operations data
+- `notebooks/02_eda.ipynb` – EDA on `production_with_qc`  
+- Plots saved under `plots/`
 
 ---
 
-## Project Summary
+## Phase 4: Dashboards in Tableau
 
-> This simulated analytics project replicates how a Data Analyst would monitor and improve a real glass manufacturing line. From simulating shift-level production data to uncovering root causes of rework, the project concludes with a Tableau dashboard ready for stakeholder reporting.
+We built two Tableau dashboards on top of the SQL-curated dataset to simulate plant-level monitoring in a manufacturing environment.
+
+### Dashboards
+
+**Production Overview**
+
+- KPIs: Total Units, Rework Rate, Avg Cycle Time  
+- Units by Product Category & Shift  
+- Cycle Time by Category  
+- Throughput trend over time  
+- Filters: Product Category, Shift, Machine, Month  
+
+**Quality & Rework Insights**
+
+- Rework rate by Product Category, Shift, and Machine  
+- Rework Units vs. Rework Rate  
+- Pareto of Rework Reasons  
+- Downtime by Machine / Category  
+
+### Previews
+
+![Production Overview](dashboards/screenshots/production_thumbnail.png)  
+![Quality Insights](dashboards/screenshots/quality_thumbnail.png)
+
+> 🔗 **View Tableau Dashboard:**  
+> [Production KPIs & Downtime Trends](https://public.tableau.com/app/profile/andrea.lopera/viz/ProductionKPIsDowntimeTrends/ProductionOverview)
+
+### Files
+
+- `dashboards/Production Overview.twbx` – Tableau workbook  
+- `dashboards/screenshots/` – Dashboard previews  
+
+---
+
+## Phase 5: Modeling – Rework Risk & Rework Reason
+
+We trained classification models to answer two core questions that apply across many manufacturing environments:
+
+1. **Rework risk:** *Will this unit require rework?*  
+2. **Rework reason:** *If it fails, what type of issue is most likely?*
+
+---
+
+### 5.1 Rework Risk – Logistic Regression vs Random Forest
+
+**Features used**
+
+- `cycle_time`  
+- `shift`  
+- `machine_id`  
+- `product_type`  
+- `product_category`  
+- `production_month` (from timestamp)  
+
+Categorical variables were one-hot encoded.
+
+#### Logistic Regression (class-weighted)
+
+- **Goal:** Interpretable baseline, adjusted for class imbalance.  
+
+**Metrics (rework class):**
+
+- Accuracy ≈ **0.57**  
+- Precision ≈ **0.38**  
+- Recall ≈ **0.83**  
+- F1 ≈ **0.52**  
+
+**Interpretation:**
+
+- **Standard vs Custom** and **product family** (e.g., Flooring, Stairs) have clear effects on rework risk.  
+- **Night shift (Shift 3)** shows higher rework probability.  
+- Some machines consistently appear as lower-risk even after controlling for other factors.
+
+#### Random Forest (tuned)
+
+- **Goal:** Maximize recall on rework units and capture non-linear relationships.  
+
+**Metrics (rework class):**
+
+- Accuracy ≈ **0.54**  
+- Precision ≈ **0.37**  
+- Recall ≈ **0.91**  
+- F1 ≈ **0.53**  
+
+**Feature importance (top drivers):**
+
+- **`cycle_time`** is the dominant driver: longer, more complex jobs fail more often.  
+- **`product_type_Standard`** (negative) and complex categories (Flooring, Stairs) are important secondary signals.  
+- Shift and machine ID refine risk at the margin.
+
+#### Model Comparison
+
+```text
+| Model                                | Accuracy | Precision | Recall |   F1   |
+|--------------------------------------|---------:|----------:|-------:|-------:|
+| Logistic Regression (class_weighted) |   0.567  |    0.381  | 0.828  | 0.522  |
+| Random Forest (tuned)                |   0.539  |    0.374  | 0.914  | 0.531  |
+```
+
+**Why Random Forest for Rework Risk?**
+
+- In a production context, **recall on rework is the priority**: missing defective units (false negatives) is more costly than over-flagging good ones.  
+- Random Forest catches **~91%** of rework units vs **~83%** for Logistic Regression, with a slightly stronger F1.  
+- **Logistic Regression** is kept as a transparent benchmark;  
+  **Random Forest** is used as the main rework-risk model because it maximizes recall while maintaining similar overall performance.
+
+---
+
+### 5.2 Rework Reason – Grouped Buckets (Random Forest)
+
+For units that failed QC (`rework_flag = 1`), we predict a **high-level rework bucket**:
+
+- **Dimensional / Assembly Issues**  
+- **Equipment / Human Factors**  
+- **Surface / Material Defects**  
+
+(Each bucket groups several detailed reasons like edge chips, misalignment, contamination, material defects, etc.)
+
+**Metrics (test set)**
+
+```text
+| Bucket                         | Precision | Recall |  F1  | Support |
+|--------------------------------|----------:|-------:|-----:|--------:|
+| Dimensional / Assembly Issues  |     0.95  |  0.93  | 0.94 |   2377  |
+| Equipment / Human Factors      |     0.89  |  0.98  | 0.93 |    541  |
+| Surface / Material Defects     |     0.33  |  0.30  | 0.32 |    204  |
+| **Overall Accuracy**           |           |        |**0.90**|  3122  |
+```
+
+**Observations**
+
+- The model reliably distinguishes between **Dimensional / Assembly** vs **Equipment / Human Factors** causes.  
+- **Surface / Material Defects** is rarer and harder to separate, but still meaningfully better than random.  
+- **Machine ID** (especially certain machines) and **process times** are the strongest drivers of which bucket a failed unit falls into.  
+- This structure is generic enough to apply to many factories (e.g., “setup/assembly issues”, “equipment/operator factors”, “material/surface defects”).
+
+**Interpretation**
+
+The model shows that **machine identity + process behavior** can be used to not only predict *whether* a unit will fail, but also **what kind of corrective action is likely needed** (setup/assembly vs equipment/operator vs material).
+
+---
 
 
-> This project is part of a career portfolio in **manufacturing analytics** and **process intelligence**.
 
 
 

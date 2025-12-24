@@ -28,7 +28,7 @@ CREATE TABLE production_logs_raw(
 
 -- Copy JSON as text into the staging table
 -- Run the following scrip on PSQL Tool Workspace without \n. Again make sure that PSQL Tool Workspace is connected to the correct database.
--- \copy production_logs_raw(payload) FROM '/Users/AndreaLopera/Desktop/Data Science Portfolio/Production-Line-Intelligence-Dashboard-main/data/Production_Logs.json' WITH (FORMAT text);
+-- \copy production_logs_raw(payload) FROM '/Users/AndreaLopera//Users/AndreaLopera/Documents/GitHub/Production-Line-Intelligence-Rework-Risk-Modeling/data/Production_Logs.json' WITH (FORMAT text);
 
 -- Insert into the table 
 INSERT INTO production_logs (
@@ -67,7 +67,7 @@ CREATE TABLE quality_audit (
 
 -- Import the data from the CSV file
 -- -- Run the following scrip on PSQL Tool Workspace without \n. Again make sure that PSQL Tool Workspace is connected to the correct database.
--- \copy quality_audit FROM '/Users/AndreaLopera/Desktop/Data Science Portfolio/Production-Line-Intelligence-Dashboard-main/data/Quality_Audit.csv' WITH (FORMAT CSV, HEADER TRUE, DELIMITER ',');
+-- \copy quality_audit FROM '/Users/AndreaLopera//Users/AndreaLopera/Documents/GitHub/Production-Line-Intelligence-Rework-Risk-Modeling/data/Quality_Audit.csv' WITH (FORMAT CSV, HEADER TRUE, DELIMITER ',');
 
 -- Create a view 
 -- Perform a JOIN to connect both tables using the primary and foreign key

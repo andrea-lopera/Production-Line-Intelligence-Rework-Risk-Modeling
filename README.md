@@ -426,3 +426,39 @@ The model shows that **machine identity + process behavior** can be used to not 
 - Sustained performance improvements.
 - Enabled data-driven daily management.
 
+---
+
+## Phase 7: Improvement Prioritization & Decision Framework
+
+Improvement opportunities identified in Phase 6 were prioritized based on expected operational impact, implementation complexity, and scalability across product families in a discrete manufacturing environment.
+
+**High Impact / Low Complexity**
+- Flow separation by product family (standard vs complex products) to reduce cycle time variability and congestion.
+- Risk-based quality checkpoints for long cycle-time and high-risk units identified by the rework-risk model.
+- Machine-specific setup verification for consistently high-risk machines.
+
+**High Impact / Medium Complexity**
+- Standard work and error-proofing (poka-yoke) concepts for framing and assembly operations.
+- Shift-level handoff standardization to reduce performance variability across shifts.
+
+**Strategic / Longer-Term**
+- Integration of predictive rework-risk outputs into inspection workflows or MES decision logic.
+- Closed-loop feedback between quality outcomes, maintenance planning, and operator training programs.
+
+This prioritization framework supports phased implementation, allowing operations teams to capture early gains while building toward more advanced, system-level improvements.
+
+---
+
+## Phase 8: Modeled Impact & Scope
+
+Based on the simulated production environment and model outputs, the proposed Lean-aligned improvements are expected to reduce rework risk and stabilize throughput by intercepting high-risk units earlier and reducing process variability across machines, shifts, and product families.
+
+**Modeled directional impact includes:**
+- Reduction in overall rework rate through predictive quality triggers and standardized work.
+- Improved first-pass yield driven by earlier detection of dimensional and assembly risks.
+- Reduced cycle time variability for complex product families through flow separation and line balancing.
+- Improved operational predictability through machine-level performance monitoring and control mechanisms.
+
+This project focuses on analytics-driven insight generation and improvement design. While the data and models are simulated, the process logic, operational patterns, and Lean improvement recommendations are grounded in real-world manufacturing experience. Physical process changes, pilot execution, and financial validation were intentionally out of scope.
+
+

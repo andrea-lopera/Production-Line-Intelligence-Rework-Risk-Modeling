@@ -1,7 +1,7 @@
 # Production Line Intelligence & Rework Risk Modeling
 
 A simulated **multi-stage production line** analytics project for tracking throughput, cycle time, rework, and downtime using **Python**, **PostgreSQL**, **Tableau**, and **machine learning**.  
-(Modeled after an architectural glass line, but designed to be transferable to other discrete manufacturing environments.)
+(Modeled after an architectural glass line, but designed to be transferable to other discrete manufacturing environments.) In addition to analytics and modeling, this project includes end-to-end Lean-aligned improvement recommendations covering flow optimization, standard work, predictive quality, and operational control systems.
 
 ---
 
@@ -326,7 +326,103 @@ The model shows that **machine identity + process behavior** can be used to not 
 
 ---
 
+## Phase 6: Lean-Aligned End-to-End Improvement Recommendations
 
+### 6.1 Flow Optimization & Bottleneck Management 
 
+**Problem:** Longer cycle times and higher rework rates on complex product families (Flooring, Stairs), with variability across machines and shifts.
 
+**Lean Improvements:**
+
+- Introduced product-family-based flow lanes to separate high-complexity work from standard jobs.
+- Implemented dynamic line balancing using cycle-time distributions by product category and machine.
+- Proposed capacity buffering at known bottlenecks (tempering and framing stages) using WIP caps and priority sequencing rules.
+
+**Business Impact (Modeled):**
+
+- Reduced average cycle time variability.
+- Improved through predictability for complex SKUs.
+
+### 6.2 First-Pass Yield Improvement via Predictive Quality Triggers
+
+**Problem:** Rework rate ~9%, with long jobs and specific machines driving most failures.
+
+**Lean Improvements:**
+
+- Embedded predictive quality checkpoints before high-risk process steps using model ouputs.
+- Designed risk-based inspection routing: high-risk units receive enhanced inspection or operator review before advancing.
+- Linked machine-specific corrective actions (calibration, maintenance, setup validation) to model-identified high-risk machines.
+
+**Business Impact (Modeled):**
+
+- Reduced false-negative defects.
+- Improved first-pass yield through earlier defect interception.
+
+### 6.3 Standard Work & Error-Proofing (Poka-Yoke)
+
+**Problem:** High incidence of dimensional and assembly-related rework.
+
+**Lean Improvements:**
+
+- Developed standard work instructions for cutting, framing, and assembly steps tied to product complexity tiers.
+- Introduced visual controls and poka-yoke concepts for frame alignment, fixture placement, and setup verification.
+- Created setup verification checklists for machines with consistently higher rework probability.
+
+**Business Impact (Modeled):**
+
+- Reduced variation in assembly quality.
+- Improved operator consistency across shifts.
+
+### 6.4 Machine-Level Continuous Improvement System
+
+**Problem:** Certain machines consistently correlated with higher rework and downtime.
+
+**Lean Improvements:**
+
+- Established machine performance scorecards tracking:
+  - Rework rate
+  - Downtime minutes
+  - Cicle time drift
+- Designed a targeted maintenance and retraining loop based on machine risk profiles.
+- Introduced root-cause Kaizen triggers when thresholds are breached.
+
+**Business Impact (Modeled):**
+
+- Reduced machine-driven variability.
+- Enabled proactive maintenance rather than reactive repair.
+
+### 6.5 Shift-Level Performance Stabilization 
+
+**Problem:** Shift 3 consistently showed higher rework risk.
+
+**Lean Improvements:**
+
+- Standardized handoff protocols between shifts.
+- Introduced shift-level visual dashboards for:
+  - First-pass yield
+  - Rework rate
+  - Cycle time adherence
+- Designed shift-specific coaching and staffing alignment for complex jobs.
+
+**Business Impact (Modeled):**
+
+- Reduced shift-to-shift quality variability.
+- Improved workforce consistency and accountability.
+
+### 6.6 Control System & Operational Governance
+
+**Problem:** No closed-loop system to sustain improvements.
+
+**Lean Improvements:**
+
+- Built a process control framework using:
+  - Control charts for cycle time and rework.
+  - Daily management dashboards
+  - Escalation thresholds and response playbooks
+- Defined process ownership and accountability structure by stage (cutting, tempering, framing).
+
+**Business Impact (Modeled):**
+
+- Sustained performance improvements.
+- Enabled data-driven daily management.
 
